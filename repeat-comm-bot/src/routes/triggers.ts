@@ -7,30 +7,22 @@ import { sendModAlert } from '../core/modAlert';
 export const triggers = new Hono();
 
 const SIMILARITY_THRESHOLD = 85;
-const FLAG_AFTER_COUNT = 2;
+const FLAG_AFTER_COUNT = 5;
 const WINDOW_DAYS = 30;
 const MIN_COMMENT_LENGTH = 5;
 
 triggers.post('/on-app-install', async (c) => {
-  console.log('Repeat Comment Bot installed!');
   return c.json<TriggerResponse>({ status: 'success' }, 200);
 });
 
 triggers.post('/on-comment-submit', async (c) => {
-  console.log('Comment trigger fired!');
   const input = await c.req.json<OnCommentSubmitRequest>();
 
   const comment = input.comment;
   const author = input.author;
   const subreddit = input.subreddit;
 
-  console.log('comment:', !!comment, 'author:', !!author, 'subreddit:', !!subreddit);
-  console.log('author name:', author?.name);
-  console.log('comment body:', comment?.body);
-  console.log('comment length:', comment?.body?.trim().length);
-
   if (!comment || !author || !subreddit) {
-    console.log('Early exit: missing comment, author, or subreddit');
     return c.json<TriggerResponse>({ status: 'success' }, 200);
   }
 
@@ -39,7 +31,6 @@ triggers.post('/on-comment-submit', async (c) => {
   }
 
   if (comment.body.trim().length < MIN_COMMENT_LENGTH) {
-    console.log('Early exit: comment too short');
     return c.json<TriggerResponse>({ status: 'success' }, 200);
   }
 
@@ -51,9 +42,6 @@ triggers.post('/on-comment-submit', async (c) => {
     similarityThreshold: SIMILARITY_THRESHOLD,
     windowDays: WINDOW_DAYS,
   });
-
-  console.log('Repeat count:', result.repeatCount);
-  console.log('Flag threshold:', FLAG_AFTER_COUNT);
 
   await storeComment(redis, {
     username: author.name,
