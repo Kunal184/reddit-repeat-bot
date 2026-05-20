@@ -5,28 +5,6 @@
     "dir": "dist/server",
     "entry": "index.cjs"
   },
-  "menu": {
-    "items": [
-      {
-        "label": "Mop comments",
-        "description": "Remove this comment and all child comments. This might take a few seconds to run.",
-        "location": "comment",
-        "forUserType": "moderator",
-        "endpoint": "/internal/menu/mop-comment"
-      },
-      {
-        "label": "Mop post comments",
-        "description": "Remove all comments of this post. This might take a few seconds to run.",
-        "location": "post",
-        "forUserType": "moderator",
-        "endpoint": "/internal/menu/mop-post"
-      }
-    ]
-  },
-  "forms": {
-    "mopComment": "/internal/form/mop-comment-submit",
-    "mopPost": "/internal/form/mop-post-submit"
-  },
   "triggers": {
     "onAppInstall": "/internal/triggers/on-app-install",
     "onCommentSubmit": "/internal/triggers/on-comment-submit"
@@ -36,7 +14,8 @@
     "dev": "vite build --watch"
   },
   "permissions": {
-    "reddit": true
+    "reddit": true,
+    "redis": true
   },
   "dev": {
     "subreddit": "repeat_comm_bot_dev"
