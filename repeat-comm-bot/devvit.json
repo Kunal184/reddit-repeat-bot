@@ -32,6 +32,11 @@
         "type": "number",
         "label": "Similarity Threshold (0-100). How similar comments need to be to count as repeats. 100 = identical only.",
         "defaultValue": 100
+      },
+      "flagAfterCount": {
+        "type": "number",
+        "label": "Flag after this many similar comments",
+        "defaultValue": 5
       }
     }
   },

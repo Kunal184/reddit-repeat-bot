@@ -6,7 +6,6 @@ import { sendModAlert } from '../core/modAlert';
 
 export const triggers = new Hono();
 
-const FLAG_AFTER_COUNT = 2;
 const WINDOW_DAYS = 30;
 const MIN_COMMENT_LENGTH = 5;
 
@@ -39,6 +38,9 @@ triggers.post('/on-comment-submit', async (c) => {
   const alertTypeRaw = await settings.get('alertType');
   const alertType = String(Array.isArray(alertTypeRaw) ? alertTypeRaw[0] : (alertTypeRaw ?? 'report'));
 
+  const flagAfterRaw = await settings.get('flagAfterCount');
+  const flagAfterCount = Number(Array.isArray(flagAfterRaw) ? flagAfterRaw[0] : (flagAfterRaw ?? 5));
+
   const result = await checkRepeatComment(redis, {
     username: author.name,
     commentBody: comment.body,
@@ -56,7 +58,7 @@ triggers.post('/on-comment-submit', async (c) => {
     timestamp: Date.now(),
   });
 
-  if (result.repeatCount >= FLAG_AFTER_COUNT) {
+  if (result.repeatCount >= flagAfterCount) {
     await sendModAlert(reddit, {
       subreddit: subreddit.name,
       username: author.name,
