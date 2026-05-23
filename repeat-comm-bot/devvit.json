@@ -27,6 +27,11 @@
           { "label": "Report to mod queue", "value": "report" }
         ],
         "defaultValue": "report"
+      },
+      "similarityThreshold": {
+        "type": "number",
+        "label": "Similarity Threshold (0-100). How similar comments need to be to count as repeats. 100 = identical only.",
+        "defaultValue": 100
       }
     }
   },

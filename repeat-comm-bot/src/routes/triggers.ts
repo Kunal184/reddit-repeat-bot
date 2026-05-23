@@ -6,8 +6,7 @@ import { sendModAlert } from '../core/modAlert';
 
 export const triggers = new Hono();
 
-const SIMILARITY_THRESHOLD = 85;
-const FLAG_AFTER_COUNT = 5;
+const FLAG_AFTER_COUNT = 2;
 const WINDOW_DAYS = 30;
 const MIN_COMMENT_LENGTH = 5;
 
@@ -34,12 +33,18 @@ triggers.post('/on-comment-submit', async (c) => {
     return c.json<TriggerResponse>({ status: 'success' }, 200);
   }
 
+  const similarityRaw = await settings.get('similarityThreshold');
+  const similarityThreshold = Number(Array.isArray(similarityRaw) ? similarityRaw[0] : (similarityRaw ?? 100));
+
+  const alertTypeRaw = await settings.get('alertType');
+  const alertType = String(Array.isArray(alertTypeRaw) ? alertTypeRaw[0] : (alertTypeRaw ?? 'report'));
+
   const result = await checkRepeatComment(redis, {
     username: author.name,
     commentBody: comment.body,
     commentId: comment.id,
     postId: comment.postId,
-    similarityThreshold: SIMILARITY_THRESHOLD,
+    similarityThreshold,
     windowDays: WINDOW_DAYS,
   });
 
@@ -52,8 +57,6 @@ triggers.post('/on-comment-submit', async (c) => {
   });
 
   if (result.repeatCount >= FLAG_AFTER_COUNT) {
-    const alertTypeRaw = await settings.get('alertType');
-    const alertType = String(Array.isArray(alertTypeRaw) ? alertTypeRaw[0] : (alertTypeRaw ?? 'report'));
     await sendModAlert(reddit, {
       subreddit: subreddit.name,
       username: author.name,

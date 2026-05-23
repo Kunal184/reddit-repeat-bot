@@ -26,16 +26,23 @@ function normalize(text: string): string {
   return text.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
 }
 
-function similarity(a: string, b: string): number {
+function similarity(a: string, b: string, threshold: number): number {
+  // At 100%, require exact match including punctuation and casing
+  if (threshold === 100) {
+    return a.trim() === b.trim() ? 100 : 0;
+  }
+
   const normA = normalize(a);
   const normB = normalize(b);
   if (normA === normB) return 100;
   if (normA.length < 2 || normB.length < 2) return 0;
+
   const getBigrams = (str: string) => {
     const bigrams = new Set<string>();
     for (let i = 0; i < str.length - 1; i++) bigrams.add(str.slice(i, i + 2));
     return bigrams;
   };
+
   const bigramsA = getBigrams(normA);
   const bigramsB = getBigrams(normB);
   let intersection = 0;
@@ -53,11 +60,13 @@ export async function checkRepeatComment(
   const past: StoredComment[] = raw ? JSON.parse(raw) : [];
   const cutoff = Date.now() - windowDays * 24 * 60 * 60 * 1000;
   const matched: StoredComment[] = [];
+
   for (const p of past) {
     if (p.timestamp < cutoff) continue;
     if (p.postId === postId) continue;
-    if (similarity(commentBody, p.body) >= similarityThreshold) matched.push(p);
+    if (similarity(commentBody, p.body, similarityThreshold) >= similarityThreshold) matched.push(p);
   }
+
   return { repeatCount: matched.length, matchedComments: matched.slice(0, 5) };
 }
 
