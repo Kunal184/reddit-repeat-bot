@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import type { OnCommentSubmitRequest, TriggerResponse } from '@devvit/web/shared';
-import { reddit, redis } from '@devvit/web/server';
+import { reddit, redis, settings } from '@devvit/web/server';
 import { checkRepeatComment, storeComment } from '../core/commentTracker';
 import { sendModAlert } from '../core/modAlert';
 
@@ -52,6 +52,8 @@ triggers.post('/on-comment-submit', async (c) => {
   });
 
   if (result.repeatCount >= FLAG_AFTER_COUNT) {
+    const alertTypeRaw = await settings.get('alertType');
+    const alertType = String(Array.isArray(alertTypeRaw) ? alertTypeRaw[0] : (alertTypeRaw ?? 'report'));
     await sendModAlert(reddit, {
       subreddit: subreddit.name,
       username: author.name,
@@ -59,6 +61,7 @@ triggers.post('/on-comment-submit', async (c) => {
       commentBody: comment.body,
       repeatCount: result.repeatCount,
       examples: result.matchedComments,
+      alertType,
     });
   }
 

@@ -17,6 +17,19 @@
     "reddit": true,
     "redis": true
   },
+  "settings": {
+    "subreddit": {
+      "alertType": {
+        "type": "select",
+        "label": "Alert Type",
+        "options": [
+          { "label": "Modmail", "value": "modmail" },
+          { "label": "Report to mod queue", "value": "report" }
+        ],
+        "defaultValue": "report"
+      }
+    }
+  },
   "dev": {
     "subreddit": "repeat_comm_bot_dev"
   }
