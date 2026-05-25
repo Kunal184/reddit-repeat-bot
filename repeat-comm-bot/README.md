@@ -1,37 +1,31 @@
-# CommentBotCatcher
+# CommentSpamBot
 
-A moderation tool that automatically detects and flags users who post repetitive comments across your subreddit.
+A Reddit moderation tool that automatically detects and flags users who post repetitive comments across your subreddit.
 
 ## What it does
 
-CommentBotCatcher runs silently in the background, monitoring every comment posted in your subreddit. When a user posts the same or very similar comment across multiple posts, the app sends an alert to your mod team via modmail so you can investigate and take action.
+CommentSpamBot runs silently in the background, monitoring every comment posted in your subreddit. When a user posts the same or very similar comment across multiple posts, the app alerts your mod team so you can investigate and take action.
 
 ## How it works
 
-Every comment is stored and compared against that user's comment history. If a user posts 5 or more similar comments across different posts within a 30 day window, mods receive a modmail alert with examples of the repeated comments and a link to the latest one.
+Every comment is stored and compared against that user's comment history. When a user hits the configured threshold of similar comments within the last 30 days, mods receive either a modmail or a mod queue report depending on your settings.
 
-The app uses fuzzy matching to catch slight variations — so "Beautiful!" and "Beautifull!" would both count toward the same user's repeat total.
+Comments on the same post are ignored — only comments across different posts count toward the threshold.
 
-## Modmail alert
+## Mod settings
 
-When a user is flagged you'll receive a modmail that includes:
-
-- The username of the flagged user
-- How many repeat comments were detected
-- The latest comment and a direct link to it
-- Up to 5 examples of previous similar comments
-
-## Default settings
+All settings are configurable per subreddit from the app's settings page.
 
 | Setting | Default | Description |
 |---|---|---|
-| Flag after | 5 comments | How many similar comments before alerting |
-| Similarity threshold | 85% | How similar comments need to be to count |
-| Window | 30 days | How far back to look |
-| Min length | 5 characters | Ignore very short comments |
+| Alert Type | Report to mod queue | Whether to send modmail or report to the mod queue |
+| Similarity Threshold | 100 | How similar comments need to be (0-100). 100 = exact match including punctuation |
+| Flag after count | 5 | How many similar comments before alerting |
 
 ## Notes
 
-- The bot ignores AutoModerator comments
+- AutoModerator comments are ignored
+- Comments shorter than 5 characters are ignored
 - Comments on the same post don't count toward the repeat total
 - Mods decide what action to take — the bot only alerts, it never removes or bans automatically
+- A user will only trigger one alert per hour to avoid modmail spam
